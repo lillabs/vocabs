@@ -12,7 +12,7 @@ public class Word
     [StringLength(100)]
     public string Value { get; set; }
     
-    [Required]
-    [Column("LANGUAGE")]
+    [Column("LANGUAGE_ID")]
+    public string LanguageId { get; set; }
     public ELanguage Language { get; set; }
 }

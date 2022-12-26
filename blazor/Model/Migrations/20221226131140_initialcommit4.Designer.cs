@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Model.Configuration;
 
@@ -10,9 +11,10 @@ using Model.Configuration;
 namespace Model.Migrations
 {
     [DbContext(typeof(VocabsDbContext))]
-    partial class VocabsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221226131140_initialcommit4")]
+    partial class initialcommit4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,6 +46,7 @@ namespace Model.Migrations
                         .HasColumnName("CREATED_AT");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("DESCRIPTION");
 
@@ -75,12 +78,13 @@ namespace Model.Migrations
                         .HasColumnName("CREATED_AT");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("DESCRIPTION");
 
-                    b.Property<int?>("FolderId")
+                    b.Property<int>("FolderId")
                         .HasColumnType("int")
-                        .HasColumnName("FOLDER_ID");
+                        .HasColumnName("DIRECTORY_ID");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -240,7 +244,9 @@ namespace Model.Migrations
                 {
                     b.HasOne("Model.Entities.Folder", "Folder")
                         .WithMany()
-                        .HasForeignKey("FolderId");
+                        .HasForeignKey("FolderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Folder");
                 });

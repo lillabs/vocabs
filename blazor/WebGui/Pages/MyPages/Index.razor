@@ -1,4 +1,62 @@
 ﻿@page "/"
+@using Model.Entities
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Dashboard</PageTitle>
 
+<MudStack Spacing="4" Style="margin-top: 2rem;">
+    <h1>Dashboard</h1>
+    <h2>Study Sets</h2>
+    @if (StudySets != null)
+    {
+        <MudGrid>
+            @foreach (var studySet in StudySets)
+            {
+                <MudItem xs="3">
+                    <MudPaper Elevation="3">
+                        
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+    else
+    {
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Create" Color="Color.Primary" Size="Size.Large">
+            Create your first Study Set!
+        </MudButton>
+    }
+    <h2>Folders</h2>
+    @if (Folders != null)
+    {
+        <MudGrid>
+            @foreach (var folder in Folders)
+            {
+                <MudItem xs="3">
+                    <MudPaper Elevation="3">
+
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+    else
+    {
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.CreateNewFolder" Color="Color.Dark">
+            Create your first Folder!
+        </MudButton>
+    }
+</MudStack>
+
+@code {
+
+    List<StudySet>? StudySets { get; set; } = null;
+
+    List<Folder>? Folders { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+    // StudySets = await StudySetRepository.GetRecentStudySets();
+    // Folders = await FolderRepository.GetRecentFolders();
+    }
+
+}

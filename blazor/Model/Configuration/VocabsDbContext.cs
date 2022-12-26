@@ -36,6 +36,11 @@ public class VocabsDbContext : DbContext
             .HasOne(p => p.LearningWord)
             .WithMany()
             .HasForeignKey(p => p.LearningWordId);
+
+        modelBuilder.Entity<Word>()
+            .HasOne(w => w.Language)
+            .WithMany()
+            .HasForeignKey(w => w.LanguageId);
         
         modelBuilder.Entity<Word>()
             .HasDiscriminator<string>("WORD_TYPE")

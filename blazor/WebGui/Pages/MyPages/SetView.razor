@@ -1,0 +1,43 @@
+﻿@page "/SetView"
+
+<MudStack Spacing="4" Style="margin-top: 2rem;">
+    <MudGrid>
+        <MudItem xs="9">
+            <h1>
+                Study Sets
+            </h1>
+        </MudItem>
+        <MudItem xs="3">
+            <MudSelect @bind-Value="sortMethod" Margin="Margin.Dense" Label="Sort" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("Alphabetically")"></MudSelectItem>
+                <MudSelectItem Value="@("Last Created")"></MudSelectItem>
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+    @if (StudySets != null)
+    {
+        @foreach (var studySet in StudySets)
+        {
+            <a href="#">
+                <MudCard>
+                    <MudCardContent>
+                        <MudText>@studySet.Name</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </a>
+        }
+    }
+</MudStack>
+
+@code {
+    string sortMethod { get; set; }
+
+    List<StudySet>? StudySets { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        sortMethod = "Alphabetically";
+        StudySets = await StudySetRepository.GetAllStudySets();
+    }
+
+}

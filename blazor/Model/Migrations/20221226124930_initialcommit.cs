@@ -13,6 +13,19 @@ namespace Model.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "E_LANGUAGES",
+                columns: table => new
+                {
+                    VALUE = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_E_LANGUAGES", x => x.VALUE);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "FOLDERS",
                 columns: table => new
                 {
@@ -40,13 +53,20 @@ namespace Model.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     VALUE = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    LANGUAGE = table.Column<int>(type: "int", nullable: false),
+                    LANGUAGE_ID = table.Column<string>(type: "varchar(50)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     WORD_TYPE = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WORDS_ST", x => x.WORD_ID);
+                    table.ForeignKey(
+                        name: "FK_WORDS_ST_E_LANGUAGES_LANGUAGE_ID",
+                        column: x => x.LANGUAGE_ID,
+                        principalTable: "E_LANGUAGES",
+                        principalColumn: "VALUE",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -128,6 +148,11 @@ namespace Model.Migrations
                 name: "IX_WORDPAIRS_STUDY_SET_ID",
                 table: "WORDPAIRS",
                 column: "STUDY_SET_ID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WORDS_ST_LANGUAGE_ID",
+                table: "WORDS_ST",
+                column: "LANGUAGE_ID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -143,6 +168,9 @@ namespace Model.Migrations
 
             migrationBuilder.DropTable(
                 name: "FOLDERS");
+
+            migrationBuilder.DropTable(
+                name: "E_LANGUAGES");
         }
     }
 }

@@ -1,0 +1,95 @@
+﻿@page "/FolderView/{*url}"
+@using System.Text.RegularExpressions
+
+<MudStack Spacing="4" Style="margin-top: 2rem;">
+    <MudGrid>
+        <MudItem xs="9">
+            <h1>
+                @*<span>/ </span>
+                @foreach (var folderPath in Path)
+                {
+                    <span>
+                        <a href="@folderPath.Link">
+                            @folderPath.Name
+                        </a>
+                    </span>
+                    <span>/ </span>
+                }*@
+            </h1>
+        </MudItem>
+        <MudItem xs="3">
+            <MudSelect @bind-Value="sortMethod" Margin="Margin.Dense" Label="Sort" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("Alphabetically")"></MudSelectItem>
+                <MudSelectItem Value="@("Last Created")"></MudSelectItem>
+            </MudSelect>
+        </MudItem>
+    </MudGrid>
+    @Url
+    
+    <MudCard>
+        <MudCardContent>
+            <MudText>@Folder.Id</MudText>
+        </MudCardContent>
+    </MudCard>
+    <MudDivider/>
+    @*@foreach (var folder in Folders)
+    {
+        <MudCard>
+            <MudCardContent>
+                <MudText>@folder.Name</MudText>
+            </MudCardContent>
+        </MudCard>
+    }*@
+</MudStack>
+
+@code {
+
+    string sortMethod { get; set; }
+    
+    [Parameter]
+    public string? Url { get; set; }
+
+    struct FolderPath
+    {
+        public string Name;
+        public string Link;
+
+        public FolderPath(string name, string link)
+        {
+            Name = name;
+            Link = link;
+        }
+    }
+    
+    List<FolderPath> Path { get; set; }
+
+    List<Folder> Folders { get; set; }
+    
+    Folder Folder { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        sortMethod = "Alphabetically";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrEmpty(Url))
+        {
+            Url = "/";
+        }
+        
+        Folder = await FolderRepository.GetFolderByUrl(Url);
+        Url = Regex.Replace(Url, @"\s+", "");
+
+        Path = new List<FolderPath>();
+        var urlparts = Url.Split("/");
+        var link = "/folderview/";
+        foreach (var urlpart in urlparts)
+        {
+            link += urlpart + "/";
+            Path.Add(new FolderPath(urlpart, link));
+        }
+    }
+
+}
