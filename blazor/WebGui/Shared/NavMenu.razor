@@ -1,0 +1,24 @@
+﻿<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">
+        <div class="d-flex">
+            <MudText>Dashboard</MudText>
+            <MudIcon Icon="@Icons.Material.Filled.Dashboard" Color="Color.Default" Class="d-flex ml-auto"/>
+        </div>
+    </MudNavLink>
+    <MudNavLink Href="/folderview" Match="NavLinkMatch.Prefix">
+        <div class="d-flex">
+            <MudText>Folders</MudText>
+            <MudIcon Icon="@Icons.Material.Filled.Folder" Color="Color.Default" Class="d-flex ml-auto"/>
+        </div>
+    </MudNavLink>
+    <MudNavLink Href="/studysetview" Match="NavLinkMatch.Prefix">
+        <div class="d-flex">
+            <MudText>Study Sets</MudText>
+            <MudIcon Icon="@Icons.Material.Filled.Done" Color="Color.Default" Class="d-flex ml-auto"/>
+        </div>
+    </MudNavLink>
+    @*<MudNavGroup Title="Settings" Expanded="true">
+        <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
+        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
+    </MudNavGroup>*@
+</MudNavMenu>
