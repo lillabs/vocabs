@@ -11,9 +11,13 @@
         <MudGrid>
             @foreach (var studySet in StudySets)
             {
-                <MudItem xs="3">
+                <MudItem xs="4">
                     <MudPaper Elevation="3">
-                        
+                        <MudCard>
+                            <MudCardContent>
+                                <MudText>@studySet.Name</MudText>
+                            </MudCardContent>
+                        </MudCard>
                     </MudPaper>
                 </MudItem>
             }
@@ -49,13 +53,13 @@
 
 @code {
 
-    List<StudySet>? StudySets { get; set; } = null;
+    List<StudySet>? StudySets { get; set; }
 
-    List<Folder>? Folders { get; set; } = null;
+    List<Folder>? Folders { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-    // StudySets = await StudySetRepository.GetRecentStudySets();
+        StudySets = await StudySetRepository.GetRecentStudySets();
     // Folders = await FolderRepository.GetRecentFolders();
     }
 

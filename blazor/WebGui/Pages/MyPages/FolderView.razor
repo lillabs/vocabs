@@ -1,95 +1,140 @@
-﻿@page "/FolderView/{*url}"
-@using System.Text.RegularExpressions
+﻿@page "/FolderView/"
+@page "/FolderView/{folderId:int?}"
+@using Microsoft.EntityFrameworkCore.Diagnostics.Internal
+@using Microsoft.EntityFrameworkCore.Diagnostics
+@using System.Linq.Expressions
 
 <MudStack Spacing="4" Style="margin-top: 2rem;">
     <MudGrid>
         <MudItem xs="9">
-            <h1>
-                @*<span>/ </span>
-                @foreach (var folderPath in Path)
+            @*<h1>
+                <span>/ </span>
+                @foreach(var segment in Path)
                 {
                     <span>
-                        <a href="@folderPath.Link">
-                            @folderPath.Name
+                        <a href="@segment.Link">
+                            @segment.Name
                         </a>
                     </span>
-                    <span>/ </span>
-                }*@
-            </h1>
+                }
+            </h1>*@
         </MudItem>
         <MudItem xs="3">
-            <MudSelect @bind-Value="sortMethod" Margin="Margin.Dense" Label="Sort" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem Value="@("Alphabetically")"></MudSelectItem>
-                <MudSelectItem Value="@("Last Created")"></MudSelectItem>
+            <MudSelect T="string" @bind-Value="sortMethod" OpenIcon="@Icons.Material.Filled.Sort" Margin="Margin.Dense" Label="Sort" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("Alphabetically")"/>
+                <MudSelectItem Value="@("Last Created")"/>
             </MudSelect>
         </MudItem>
     </MudGrid>
-    @Url
-    
-    <MudCard>
-        <MudCardContent>
-            <MudText>@Folder.Id</MudText>
-        </MudCardContent>
-    </MudCard>
-    <MudDivider/>
-    @*@foreach (var folder in Folders)
+    @if (Folders is {Count: > 0 })
     {
-        <MudCard>
-            <MudCardContent>
-                <MudText>@folder.Name</MudText>
-            </MudCardContent>
-        </MudCard>
-    }*@
+        <h3>@(Folders.Count == 1 ? "Folder" : "Folders")</h3>
+        <MudCarousel TData="object" Style="height: 200px; width: 120%; transform: translateX(-8.33%)" ShowArrows="true" ShowBullets="true" EnableSwipeGesture="true" AutoCycle="false">
+            @foreach (var folderpage in FolderCarousel)
+            {
+                <MudCarouselItem>
+                    <MudGrid Style="width: 83.33%; margin: auto;">
+                        @foreach (var folder in folderpage)
+                        {
+                            <MudItem xs="4">
+                                <MudCard Elevation="3" @onclick="() => GoToFolder(folder.Id)" Style="cursor: pointer;">
+                                    <MudCardContent>
+                                        <MudText>@folder.Name</MudText>
+                                    </MudCardContent>
+                                </MudCard>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudCarouselItem>
+            }
+        </MudCarousel>
+
+        <div style="margin-bottom: 3rem;"></div>
+    }
+    @if (StudySets is {Count: > 0 })
+    {
+        <h3>@(StudySets.Count == 1 ? "Study Set" : "Study Sets")</h3>
+        @foreach (var studySet in StudySets)
+        {
+            <a>
+                <MudCard Elevation="3">
+                    <MudCardContent>
+                        <MudText>@studySet.Name</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </a>
+        }
+    }
 </MudStack>
 
 @code {
 
-    string sortMethod { get; set; }
-    
-    [Parameter]
-    public string? Url { get; set; }
+    string _sortMethod;
 
-    struct FolderPath
+    string sortMethod
     {
-        public string Name;
-        public string Link;
-
-        public FolderPath(string name, string link)
+        get => _sortMethod;
+        set
         {
-            Name = name;
-            Link = link;
+            _sortMethod = value;
+            if (Folders == null) return;
+            switch (sortMethod)
+            {
+                case "Last Created":
+                    Folders.Sort((f1, f2) => f2.CreatedAt.CompareTo(f1.CreatedAt));
+                    break;
+                case "Alphabetically":
+                default:
+                    Folders.Sort((f1, f2) => f1.Name.CompareTo(f2.Name));
+                    break;
+            }
         }
     }
-    
-    List<FolderPath> Path { get; set; }
 
-    List<Folder> Folders { get; set; }
-    
-    Folder Folder { get; set; }
+    [Parameter]
+    public int? FolderId { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    List<Folder>? Folders { get; set; }
+
+    List<List<Folder>>? FolderCarousel
     {
-        sortMethod = "Alphabetically";
+        get
+        {
+            List<List<Folder>> _foldersList = new List<List<Folder>>();
+            @for (int i = 0; i < Convert.ToInt32(Math.Floor((decimal)(Folders.Count / 6))) + 1; i++)
+            {
+                _foldersList.Add(new List<Folder>());
+                @for (int j = i * 6; j < i * 6 + 6 && j < Folders.Count; j++)
+                {
+                    _foldersList[i].Add(Folders[j]);
+                }
+            }
+            return _foldersList;
+        }
     }
+
+    void GoToFolder(int folderId)
+    {
+        NavigationManager.NavigateTo($"/folderview/{folderId}");
+    }
+
+    List<StudySet>? StudySets { get; set; }
+
+    Path Path { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (string.IsNullOrEmpty(Url))
+        if (FolderId.HasValue)
         {
-            Url = "/";
+            Folders = await FolderRepository.ReadAsync(f => f.ParentFolderId == FolderId.Value);
+            StudySets = await StudySetRepository.ReadAsync(s => s.FolderId == FolderId);
         }
-        
-        Folder = await FolderRepository.GetFolderByUrl(Url);
-        Url = Regex.Replace(Url, @"\s+", "");
-
-        Path = new List<FolderPath>();
-        var urlparts = Url.Split("/");
-        var link = "/folderview/";
-        foreach (var urlpart in urlparts)
+        else
         {
-            link += urlpart + "/";
-            Path.Add(new FolderPath(urlpart, link));
+            Folders = await FolderRepository.ReadAsync(f => f.ParentFolderId == null);
         }
+        sortMethod = "Alphabetically";
+        StateHasChanged();
     }
 
 }

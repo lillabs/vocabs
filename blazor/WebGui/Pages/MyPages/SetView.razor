@@ -8,9 +8,9 @@
             </h1>
         </MudItem>
         <MudItem xs="3">
-            <MudSelect @bind-Value="sortMethod" Margin="Margin.Dense" Label="Sort" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-                <MudSelectItem Value="@("Alphabetically")"></MudSelectItem>
-                <MudSelectItem Value="@("Last Created")"></MudSelectItem>
+            <MudSelect T="string" @bind-Value="sortMethod" OpenIcon="@Icons.Material.Filled.Sort" Margin="Margin.Dense" Label="Sort" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem Value="@("Alphabetically")"/>
+                <MudSelectItem Value="@("Last Created")"/>
             </MudSelect>
         </MudItem>
     </MudGrid>
@@ -19,7 +19,7 @@
         @foreach (var studySet in StudySets)
         {
             <a href="#">
-                <MudCard>
+                <MudCard Elevation="3">
                     <MudCardContent>
                         <MudText>@studySet.Name</MudText>
                     </MudCardContent>
@@ -30,7 +30,27 @@
 </MudStack>
 
 @code {
-    string sortMethod { get; set; }
+    string _sortMethod;
+
+    string sortMethod
+    {
+        get => _sortMethod;
+        set
+        {
+            _sortMethod = value;
+            if (StudySets == null) return;
+            switch (sortMethod)
+            {
+                case "Last Created":
+                    StudySets.Sort((s1, s2) => s2.CreatedAt.CompareTo(s1.CreatedAt));
+                    break;
+                case "Alphabetically":
+                default:
+                    StudySets.Sort((s1, s2) => s1.Name.CompareTo(s2.Name));
+                    break;
+            }
+        }
+    }
 
     List<StudySet>? StudySets { get; set; }
 
