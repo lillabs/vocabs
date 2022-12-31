@@ -1,0 +1,39 @@
+﻿
+<MudAppBar Class="px-8"
+           Elevation="1"
+           Style="@GetStyle()">
+
+    
+    <MudText Typo="Typo.h5" Class="ml-3">LilLabs / </MudText>
+    <MudSpacer/>
+
+    <AuthorizeView>
+        <Authorized>
+            <AccountMenu/>
+        </Authorized>
+        <Authorizing>
+            <MudSkeleton Width="56px" Height="56px" SkeletonType="SkeletonType.Circle"/>
+        </Authorizing>
+        <NotAuthorized>
+            <MudIconButton Target="_self" Href="/auth/login" Size="Size.Large" Color="Color.Success" Icon="@Icons.Filled.Login"/>
+        </NotAuthorized>
+    </AuthorizeView>
+</MudAppBar>
+
+@code {
+
+    protected override void OnInitialized() {
+        ThemeHandler.ThemeChange += Invoker;
+    }
+
+    public void Dispose() {
+        ThemeHandler.ThemeChange -= Invoker;
+    }
+
+    private async void Invoker() =>
+        await InvokeAsync(StateHasChanged);
+
+    private string GetStyle() =>
+        ThemeHandler.DarkMode ? "background: rgba(21,27,34,0.7)" : "background: rgba(255,255,255,0.7)";
+
+}
