@@ -1,2 +1,0 @@
-# vocabs
-learning vocabulary
